@@ -302,7 +302,7 @@ export function IspSupportConsole() {
                       </div>
                       <p className="text-xs text-zinc-400 font-mono mt-1">
                         Triggered: {new Date(activeIncident.start_time || activeIncident.created_at).toLocaleString()}
-                        {activeIncident.end_time && ` | Resolved: ${new Date(activeIncident.end_time).toLocaleString()}`}
+                        {activeIncident.status === 'resolved' && activeIncident.end_time && ` | Resolved: ${new Date(activeIncident.end_time).toLocaleString()}`}
                       </p>
                     </div>
 

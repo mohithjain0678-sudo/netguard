@@ -145,7 +145,7 @@ export async function POST() {
     // 7. Step: Insert Incident Capsule with is_demo: true into Supabase
     const incidentCapsule = {
       start_time: startTime,
-      end_time: now.toISOString(),
+      end_time: null,
       probable_cause: scored.probableCause,
       confidence: scored.confidence,
       fault_domain: scored.faultDomain,
