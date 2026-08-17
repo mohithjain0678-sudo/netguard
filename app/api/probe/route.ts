@@ -1,40 +1,35 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
-import { getWifiTelemetry } from '@/lib/wifiTelemetry';
-
-async function measureLatency(): Promise<number | null> {
-  try {
-    const start = performance.now();
-    await fetch('https://www.google.com/generate_204', { cache: 'no-store' });
-    const end = performance.now();
-    return Math.round(end - start);
-  } catch {
-    return null;
-  }
-}
+import { runProbe } from '@/lib/runProbe';
 
 export async function GET() {
   try {
-    const telemetry = await getWifiTelemetry();
-    const latency_ms = await measureLatency();
+    const readingPayload = await runProbe();
 
     const { data, error } = await supabase
       .from('readings')
       .insert([
         {
-          rssi: telemetry.rssi,
-          channel: telemetry.channel,
-          band: telemetry.band,
-          latency_ms,
+          rssi: readingPayload.rssi,
+          channel: readingPayload.channel,
+          band: readingPayload.band,
+          bssid: readingPayload.bssid,
+          latency_ms: readingPayload.latency_ms,
+          packet_loss_pct: readingPayload.packet_loss_pct,
+          dns_ms: readingPayload.dns_ms,
+          receive_rate_mbps: readingPayload.receiveRateMbps,
+          transmit_rate_mbps: readingPayload.transmitRateMbps,
         },
       ])
       .select();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ data: [readingPayload], error: error.message });
     }
 
-    return NextResponse.json({ data });
+    return NextResponse.json({
+      data: data && data.length > 0 ? data : [readingPayload],
+    });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
