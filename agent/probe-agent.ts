@@ -11,6 +11,7 @@ import { flightRecorder } from '../lib/flightRecorder';
 import { selectNextTest } from '../lib/selectNextTest';
 import { scoreConfidence } from '../lib/scoreConfidence';
 import { generateExplanation } from '../lib/generateExplanation';
+import { executeDiagnostic } from '../lib/executeDiagnostic';
 
 const history: ProbeReading[] = [];
 let incidentOpen = false;
@@ -107,11 +108,10 @@ async function tick() {
           `🔍 Adaptive Diagnostics: Selected next test -> [${selectedTest}]`
         );
 
-        const testResult = {
-          testType: selectedTest,
-          result: 'placeholder',
-          timestamp: new Date().toISOString(),
-        };
+        const testResult = await executeDiagnostic(selectedTest);
+        console.log(
+          `📊 Adaptive Diagnostic Result: [${testResult.testType}] -> ${testResult.result}`
+        );
 
         const scored = scoreConfidence(reading, evidence, testResult);
         const snapshot = flightRecorder.snapshot();
@@ -126,6 +126,7 @@ async function tick() {
           supportingEvidence: scored.supportingEvidence,
           contradictingEvidence: scored.contradictingEvidence,
           flight_recorder: snapshot,
+          diagnostics: testResult,
         });
 
         const incidentCapsule = {

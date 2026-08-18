@@ -1,4 +1,5 @@
 import { ProbeReading } from './anomalyDetector';
+import { DiagnosticResult } from './executeDiagnostic';
 
 export interface ConfidenceScoreResult {
   probableCause: string;
@@ -11,7 +12,7 @@ export interface ConfidenceScoreResult {
 export function scoreConfidence(
   reading: ProbeReading,
   evidence: string[],
-  testResult?: any
+  testResult?: DiagnosticResult
 ): ConfidenceScoreResult {
   const isRssiLow =
     reading.rssi < -75 || evidence.some((e) => /rssi|signal/i.test(e));
@@ -77,15 +78,34 @@ export function scoreConfidence(
   }
 
   if (isLatencyHigh && isPacketLossLow && !isRssiLow) {
+    const isGateway =
+      testResult?.target === 'gateway' || testResult?.isGatewayIssue;
+    const isWan =
+      testResult?.target === 'wan_upstream' ||
+      (testResult?.testType === 'traceroute' && !testResult?.isGatewayIssue);
+
     return {
       probableCause: 'Network congestion or upstream latency spike',
-      faultDomain: 'Gateway/LAN',
-      confidence: 65,
+      faultDomain: isGateway ? 'Gateway/LAN' : isWan ? 'ISP/Upstream' : 'Gateway/LAN',
+      confidence: isWan ? 80 : 65,
       supportingEvidence: evidence.filter((e) => /latency/i.test(e)),
       contradictingEvidence: [
         `Signal strength is sufficient (${reading.rssi} dBm)`,
         `Packet loss is low (${reading.packet_loss_pct ?? 0}%)`,
       ],
+    };
+  }
+
+  if (testResult?.testType === 'speed_test' && testResult.status === 'warning') {
+    return {
+      probableCause: 'Bandwidth saturation / throughput degradation',
+      faultDomain: 'ISP/Upstream',
+      confidence: 85,
+      supportingEvidence: [
+        ...evidence.filter((e) => /throughput|bandwidth|speed|latency/i.test(e)),
+        testResult.result,
+      ],
+      contradictingEvidence: [],
     };
   }
 

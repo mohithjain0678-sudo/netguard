@@ -25,6 +25,7 @@ export async function generateExplanation(
   const contradictingEvidence =
     capsule.contradictingEvidence ?? capsule.contradicting_evidence ?? [];
   const flightRecorder = capsule.flight_recorder ?? [];
+  const diagnostics = capsule.diagnostics ?? null;
 
   const fallback = `The detected issue is ${probableCause} with ${confidence}% confidence. The affected fault domain is ${faultDomain}. This assessment is based on the available telemetry and diagnostic evidence.`;
 
@@ -42,6 +43,7 @@ Incident Capsule Evidence:
 - Fault Domain: ${faultDomain}
 - Supporting Evidence: ${supportingEvidence.length > 0 ? supportingEvidence.join('; ') : 'None'}
 - Contradicting Evidence: ${contradictingEvidence.length > 0 ? contradictingEvidence.join('; ') : 'None'}
+- Diagnostic Test Results: ${diagnostics ? JSON.stringify(diagnostics) : 'None'}
 - Flight Recorder Telemetry: ${JSON.stringify(flightRecorder)}
 
 Instructions:
