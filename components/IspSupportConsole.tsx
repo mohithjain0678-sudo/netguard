@@ -507,6 +507,107 @@ export function IspSupportConsole() {
                     </div>
                   </div>
 
+                  {/* Diagnostic Metric Telemetry Cards */}
+                  {activeIncident.diagnostics?.testType === 'speed_test' && activeIncident.diagnostics.metrics && (
+                    <div className="bg-zinc-950/60 border border-cyan-900/40 p-4 rounded-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs uppercase tracking-wider font-semibold text-cyan-300">
+                          Speed Test Diagnostic Telemetry
+                        </span>
+                        {activeIncident.diagnostics.metrics.duration_ms && (
+                          <span className="text-[11px] font-mono text-zinc-400">
+                            Completed in {activeIncident.diagnostics.metrics.duration_ms}ms
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <div className="bg-zinc-900/70 p-3 rounded-lg border border-zinc-800">
+                          <span className="text-[10px] uppercase tracking-wider font-medium text-zinc-400">Download Speed</span>
+                          <p className="text-base font-bold font-mono text-emerald-400 mt-0.5">
+                            {activeIncident.diagnostics.metrics.download_mbps !== null && activeIncident.diagnostics.metrics.download_mbps !== undefined
+                              ? `${activeIncident.diagnostics.metrics.download_mbps} Mbps`
+                              : 'N/A'}
+                          </p>
+                        </div>
+                        <div className="bg-zinc-900/70 p-3 rounded-lg border border-zinc-800">
+                          <span className="text-[10px] uppercase tracking-wider font-medium text-zinc-400">Upload Speed</span>
+                          <p className="text-base font-bold font-mono text-cyan-400 mt-0.5">
+                            {activeIncident.diagnostics.metrics.upload_mbps !== null && activeIncident.diagnostics.metrics.upload_mbps !== undefined
+                              ? `${activeIncident.diagnostics.metrics.upload_mbps} Mbps`
+                              : 'N/A'}
+                          </p>
+                        </div>
+                        <div className="bg-zinc-900/70 p-3 rounded-lg border border-zinc-800 col-span-2 sm:col-span-1">
+                          <span className="text-[10px] uppercase tracking-wider font-medium text-zinc-400">Latency (RTT)</span>
+                          <p className="text-base font-bold font-mono text-amber-300 mt-0.5">
+                            {activeIncident.diagnostics.metrics.latency_ms !== null && activeIncident.diagnostics.metrics.latency_ms !== undefined
+                              ? `${activeIncident.diagnostics.metrics.latency_ms} ms`
+                              : 'N/A'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeIncident.diagnostics?.testType === 'traceroute' && activeIncident.diagnostics.metrics && (
+                    <div className="bg-zinc-950/60 border border-cyan-900/40 p-4 rounded-xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs uppercase tracking-wider font-semibold text-cyan-300">
+                          Traceroute Path Trace ({activeIncident.diagnostics.metrics.destination || '8.8.8.8'})
+                        </span>
+                        {activeIncident.diagnostics.metrics.duration_ms && (
+                          <span className="text-[11px] font-mono text-zinc-400">
+                            Duration: {activeIncident.diagnostics.metrics.duration_ms}ms ({activeIncident.diagnostics.metrics.total_hops || activeIncident.diagnostics.metrics.hops?.length || 0} hops)
+                          </span>
+                        )}
+                      </div>
+                      {activeIncident.diagnostics.metrics.hops && activeIncident.diagnostics.metrics.hops.length > 0 ? (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left text-xs font-mono">
+                            <thead>
+                              <tr className="border-b border-zinc-800 text-zinc-400 text-[10px] uppercase">
+                                <th className="py-1.5 px-2">Hop</th>
+                                <th className="py-1.5 px-2">IP Address</th>
+                                <th className="py-1.5 px-2">Latency</th>
+                                <th className="py-1.5 px-2">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                              {activeIncident.diagnostics.metrics.hops.map((hop, hIdx) => (
+                                <tr key={hIdx} className={hop.timedOut ? 'bg-amber-950/20' : ''}>
+                                  <td className="py-1.5 px-2 font-bold text-zinc-400">#{hop.hop}</td>
+                                  <td className="py-1.5 px-2 text-cyan-300">{hop.ip || 'Request Timed Out'}</td>
+                                  <td className="py-1.5 px-2">
+                                    {hop.rtt_ms !== null ? (
+                                      <span className={hop.rtt_ms > 100 ? 'text-amber-400 font-semibold' : 'text-emerald-400'}>
+                                        {hop.rtt_ms} ms
+                                      </span>
+                                    ) : (
+                                      <span className="text-zinc-500">*</span>
+                                    )}
+                                  </td>
+                                  <td className="py-1.5 px-2">
+                                    {hop.timedOut ? (
+                                      <span className="px-1.5 py-0.5 text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded">
+                                        Timeout
+                                      </span>
+                                    ) : (
+                                      <span className="px-1.5 py-0.5 text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">
+                                        Active
+                                      </span>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-zinc-400 font-mono">No intermediate hop records returned.</p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Supporting & Contradicting Evidence */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Supporting Evidence */}

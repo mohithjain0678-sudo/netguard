@@ -63,6 +63,28 @@ export function detectAnomaly(
     }
   }
 
+  const validRates = recentHistory
+    .map((r) => r.receiveRateMbps)
+    .filter((v): v is number => typeof v === 'number' && !isNaN(v) && v > 0);
+
+  if (
+    reading.receiveRateMbps !== undefined &&
+    reading.receiveRateMbps !== null &&
+    validRates.length > 0
+  ) {
+    const avgRate =
+      validRates.reduce((sum, val) => sum + val, 0) / validRates.length;
+    if (avgRate >= 100 && reading.receiveRateMbps <= avgRate * 0.5) {
+      evidence.push(
+        `Throughput link capacity dropped to ${reading.receiveRateMbps} Mbps compared to recent average (${avgRate.toFixed(0)} Mbps)`
+      );
+    } else if (reading.receiveRateMbps < 40) {
+      evidence.push(
+        `Throughput link capacity degraded (measured: ${reading.receiveRateMbps} Mbps)`
+      );
+    }
+  }
+
   if (reading.dns_ms === null) {
     evidence.push('DNS resolution failed');
   }

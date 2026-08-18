@@ -25,6 +25,10 @@ export function selectNextTest(evidence: string[]): NextTestType {
     return 'speed_test';
   }
 
+  if (text.includes('packet loss') || text.includes('exceeds 250ms')) {
+    return 'traceroute';
+  }
+
   if (
     text.includes('2x') ||
     text.includes('recent average') ||
@@ -33,7 +37,7 @@ export function selectNextTest(evidence: string[]): NextTestType {
     return 'bufferbloat_check';
   }
 
-  if (text.includes('latency') || text.includes('packet loss')) {
+  if (text.includes('latency')) {
     return 'traceroute';
   }
 

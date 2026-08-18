@@ -17,6 +17,32 @@ export interface DiagnosticData {
   result?: string;
   timestamp?: string;
   target?: string;
+  isGatewayIssue?: boolean;
+  status?: string;
+  metrics?: {
+    download_mbps?: number | null;
+    upload_mbps?: number | null;
+    latency_ms?: number | null;
+    duration_ms?: number | null;
+    destination?: string | null;
+    total_hops?: number | null;
+    hops?: Array<{
+      hop: number;
+      ip: string | null;
+      rtt_ms: number | null;
+      rtts_ms?: (number | null)[];
+      timedOut: boolean;
+      raw?: string;
+    }>;
+    baseline_latency_ms?: number | null;
+    loaded_latency_ms?: number | null;
+    bufferbloat_delta_ms?: number | null;
+    gateway_ip?: string | null;
+    gateway_latency_ms?: number | null;
+    gateway_packet_loss_pct?: number | null;
+    dns_ms?: number | null;
+    [key: string]: unknown;
+  };
   [key: string]: unknown;
 }
 

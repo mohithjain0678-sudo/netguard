@@ -1275,6 +1275,64 @@ export function ClientDashboard() {
                     </p>
                   </div>
 
+                  {/* Adaptive Diagnostic Results & Metrics */}
+                  {incident.diagnostics && (
+                    <div className="rounded-lg bg-zinc-950/60 border border-zinc-800 p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-mono text-cyan-400 font-semibold uppercase tracking-wider">
+                          Adaptive Test: [{incident.diagnostics.testType || 'Verified'}]
+                        </span>
+                        {incident.diagnostics.timestamp && (
+                          <span className="text-[10px] text-zinc-500 font-mono">
+                            {new Date(incident.diagnostics.timestamp).toLocaleTimeString()}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-zinc-300 font-mono">
+                        {incident.diagnostics.result || 'Completed — Telemetry correlated'}
+                      </p>
+
+                      {/* Speed Test Metrics */}
+                      {incident.diagnostics.testType === 'speed_test' && incident.diagnostics.metrics && (
+                        <div className="grid grid-cols-3 gap-2 pt-1">
+                          <div className="bg-zinc-900/80 p-2 rounded border border-zinc-800 text-center">
+                            <span className="text-[9px] uppercase text-zinc-400 block">Download</span>
+                            <span className="text-xs font-mono font-bold text-emerald-400">
+                              {incident.diagnostics.metrics.download_mbps ?? 'N/A'} Mbps
+                            </span>
+                          </div>
+                          <div className="bg-zinc-900/80 p-2 rounded border border-zinc-800 text-center">
+                            <span className="text-[9px] uppercase text-zinc-400 block">Upload</span>
+                            <span className="text-xs font-mono font-bold text-cyan-400">
+                              {incident.diagnostics.metrics.upload_mbps ?? 'N/A'} Mbps
+                            </span>
+                          </div>
+                          <div className="bg-zinc-900/80 p-2 rounded border border-zinc-800 text-center">
+                            <span className="text-[9px] uppercase text-zinc-400 block">Latency</span>
+                            <span className="text-xs font-mono font-bold text-amber-400">
+                              {incident.diagnostics.metrics.latency_ms ?? 'N/A'} ms
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Traceroute Metrics */}
+                      {incident.diagnostics.testType === 'traceroute' && incident.diagnostics.metrics && (
+                        <div className="flex items-center justify-between text-xs font-mono bg-zinc-900/80 p-2 rounded border border-zinc-800">
+                          <span className="text-zinc-400">
+                            Target: <span className="text-cyan-300">{incident.diagnostics.metrics.destination || '8.8.8.8'}</span>
+                          </span>
+                          <span className="text-zinc-400">
+                            Hops: <span className="text-zinc-200">{incident.diagnostics.metrics.total_hops || incident.diagnostics.metrics.hops?.length || 0}</span>
+                          </span>
+                          <span className="text-zinc-400">
+                            Duration: <span className="text-emerald-400">{incident.diagnostics.metrics.duration_ms}ms</span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Supporting Evidence tags if available */}
                   {incident.supporting_evidence &&
                     incident.supporting_evidence.length > 0 && (
