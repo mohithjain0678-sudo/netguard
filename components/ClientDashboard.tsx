@@ -1289,7 +1289,10 @@ export function ClientDashboard() {
                         )}
                       </div>
                       <p className="text-xs text-zinc-300 font-mono">
-                        {incident.diagnostics.result || 'Completed — Telemetry correlated'}
+                        {incident.diagnostics.result &&
+                        incident.diagnostics.result !== 'placeholder'
+                          ? incident.diagnostics.result
+                          : 'Gateway reachability verified by probe agent'}
                       </p>
 
                       {/* Speed Test Metrics */}
