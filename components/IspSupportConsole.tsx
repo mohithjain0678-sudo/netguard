@@ -502,7 +502,7 @@ export function IspSupportConsole() {
                         {activeIncident.diagnostics?.result &&
                         activeIncident.diagnostics.result !== 'placeholder'
                           ? activeIncident.diagnostics.result
-                          : 'Gateway reachability verified by probe agent'}
+                          : 'Diagnostic check completed by probe agent'}
                       </p>
                       <p className="text-[11px] text-zinc-500">
                         Test status verified by probe agent

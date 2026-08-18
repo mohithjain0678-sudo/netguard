@@ -1292,7 +1292,7 @@ export function ClientDashboard() {
                         {incident.diagnostics.result &&
                         incident.diagnostics.result !== 'placeholder'
                           ? incident.diagnostics.result
-                          : 'Gateway reachability verified by probe agent'}
+                          : 'Diagnostic check completed by probe agent'}
                       </p>
 
                       {/* Speed Test Metrics */}
